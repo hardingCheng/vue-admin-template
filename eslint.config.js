@@ -13,7 +13,11 @@ export default [
   ...pluginVue.configs["flat/essential"],
   {
     files: ["**/*.vue"],
+    rules: {
+      "vue/multi-word-component-names": "off"
+    },
     languageOptions: { parserOptions: { parser: tseslint.parser } }
   },
+
   prettierRecommended
 ]
