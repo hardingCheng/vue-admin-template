@@ -1,18 +1,20 @@
 <template>
   <template v-if="!item.meta?.hidden">
-    <el-menu-item
-      v-if="filteredChildren.length <= 1"
-      :index="resolvePath(singleChildRoute.path)"
+    <side-bar-item-link
+      v-if="filteredChildren.length <= 1 && !item.meta?.alwaysShow"
+      :to="resolvePath(singleChildRoute.path)"
     >
-      <el-icon v-if="iconName">
-        <svg-icon :icon-name="iconName" />
-      </el-icon>
-      <template #title>{{ singleChildRoute.meta?.title }}</template>
-    </el-menu-item>
+      <el-menu-item :index="resolvePath(singleChildRoute.path)">
+        <el-icon v-if="iconName">
+          <svg-icon :icon-name="iconName" />
+        </el-icon>
+        <template #title>{{ singleChildRoute.meta?.title }}</template>
+      </el-menu-item>
+    </side-bar-item-link>
     <el-sub-menu v-else :index="item.path">
       <template #title>
         <el-icon v-if="iconName"> <svg-icon :icon-name="iconName" /> </el-icon>
-        <span>{{ singleChildRoute.meta?.title }}</span>
+        <span>{{ item.meta?.title }}</span>
       </template>
       <side-bar-item
         v-for="child of filteredChildren"
@@ -28,6 +30,7 @@
 import type { RouteRecordRaw } from "vue-router"
 import path from "path-browserify"
 import { isExternal } from "@/utils/validate.ts"
+import SideBarItemLink from "@/layout/components/SideBar/SideBarItemLink.vue"
 const { item, basePath } = defineProps<{
   item: RouteRecordRaw
   basePath: string

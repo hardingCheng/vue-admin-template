@@ -2,7 +2,6 @@
   <el-menu
     border-none
     class="sidebar-container-menu"
-    router
     :default-active="defaultActive"
     :background-color="varaibles.menuBg"
     :text-color="varaibles.menuText"

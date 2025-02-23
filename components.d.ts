@@ -8,6 +8,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    AppMain: typeof import('./src/layout/components/AppMain.vue')['default']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     ElMenu: typeof import('element-plus/es')['ElMenu']
     ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
@@ -18,6 +19,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SideBar: typeof import('./src/layout/components/SideBar/SideBar.vue')['default']
     SideBarItem: typeof import('./src/layout/components/SideBar/SideBarItem.vue')['default']
+    SideBarItemLink: typeof import('./src/layout/components/SideBar/SideBarItemLink.vue')['default']
     SvgIcon: typeof import('./src/components/SvgIcon/SvgIcon.vue')['default']
   }
 }

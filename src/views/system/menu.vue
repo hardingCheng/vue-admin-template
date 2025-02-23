@@ -1,5 +1,7 @@
 <script setup lang="ts"></script>
 
-<template>menu</template>
+<template>
+  <div>menu</div>
+</template>
 
 <style scoped></style>

@@ -57,7 +57,8 @@ const asyncRoutes: RouteRecordRaw[] = [
     redirect: "/system/menu",
     meta: {
       icon: "ant-design:unlock-filled",
-      title: "system"
+      title: "system",
+      alwaysShow: true
     },
     children: [
       {

@@ -1,5 +1,7 @@
 <script setup lang="ts"></script>
 
-<template>/guide/index</template>
+<template>
+  <div>/guide/index</div>
+</template>
 
 <style scoped></style>

@@ -9,13 +9,13 @@
         <navbar></navbar>
         <div class="tags-view">导航条-2</div>
       </div>
-      <div class="app-main">
-        <router-view></router-view>
-      </div>
+      <app-main></app-main>/
     </div>
   </div>
 </template>
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import AppMain from "@/layout/components/AppMain.vue"
+</script>
 
 <style scoped lang="scss">
 .app-wrapper {
@@ -38,10 +38,6 @@
     .tags-view {
       @apply h-[var(--tagsview-height)]  bg-blue;
     }
-  }
-  .app-main {
-    @apply bg-cyan;
-    min-height: calc(100vh - var(--tagsview-height) - var(--navbar-height));
   }
 }
 </style>

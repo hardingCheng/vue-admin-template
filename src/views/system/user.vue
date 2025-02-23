@@ -1,5 +1,7 @@
 <script setup lang="ts"></script>
 
-<template>user</template>
+<template>
+  <div>user</div>
+</template>
 
 <style scoped></style>
