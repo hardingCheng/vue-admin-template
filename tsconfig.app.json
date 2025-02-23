@@ -1,19 +1,34 @@
 {
+  // 继承 Vue 官方提供的 DOM 环境 TypeScript 配置
   "extends": "@vue/tsconfig/tsconfig.dom.json",
   "compilerOptions": {
+    // 指定构建信息文件的存储位置，用于增量编译
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
 
     /* Linting */
+    // 启用所有严格的类型检查选项
     "strict": true,
+    // 报告未使用的局部变量的错误
     "noUnusedLocals": true,
+    // 报告未使用的参数的错误
     "noUnusedParameters": true,
+    // 防止在 switch 语句中的 case 落空
     "noFallthroughCasesInSwitch": true,
+    // 检查模块导入的副作用
     "noUncheckedSideEffectImports": true,
+    // 设置基准路径为当前目录
     "baseUrl": ".",
+    // 配置路径别名，将 @ 映射到 src 目录
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["element-plus/global", "./auto-imports.d.ts", "./components.d.ts"]
+    // 声明额外的类型定义文件
+    "types": [
+      "element-plus/global", // Element Plus 的全局类型
+      "./auto-imports.d.ts", // 自动导入的类型声明
+      "./components.d.ts"    // 组件的类型声明
+    ]
   },
+  // 指定需要包含的文件模式
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
 }

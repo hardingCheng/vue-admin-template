@@ -1,21 +1,30 @@
 <template>
+  <!-- 如果路由项不是隐藏的才显示 -->
   <template v-if="!item.meta?.hidden">
+    <!-- 当子路由数量不超过1个且不强制显示子菜单时，显示为普通菜单项 -->
     <side-bar-item-link
       v-if="filteredChildren.length <= 1 && !item.meta?.alwaysShow"
       :to="resolvePath(singleChildRoute.path)"
     >
+      <!-- Element Plus 菜单项组件 -->
       <el-menu-item :index="resolvePath(singleChildRoute.path)">
+        <!-- 如果有图标则显示图标 -->
         <el-icon v-if="iconName">
           <svg-icon :icon-name="iconName" />
         </el-icon>
+        <!-- 显示菜单标题 -->
         <template #title>{{ singleChildRoute.meta?.title }}</template>
       </el-menu-item>
     </side-bar-item-link>
+
+    <!-- 当有多个子路由时，显示为子菜单 -->
     <el-sub-menu v-else :index="item.path">
+      <!-- 子菜单标题部分 -->
       <template #title>
         <el-icon v-if="iconName"> <svg-icon :icon-name="iconName" /> </el-icon>
         <span>{{ item.meta?.title }}</span>
       </template>
+      <!-- 递归渲染子菜单项 -->
       <side-bar-item
         v-for="child of filteredChildren"
         :key="child.path"
@@ -27,22 +36,29 @@
 </template>
 
 <script lang="ts" setup>
+// 导入路由类型定义
 import type { RouteRecordRaw } from "vue-router"
+// 导入路径处理工具
 import path from "path-browserify"
+// 导入外部链接验证工具
 import { isExternal } from "@/utils/validate.ts"
+// 导入自定义链接组件
 import SideBarItemLink from "@/layout/components/SideBar/SideBarItemLink.vue"
+
+// 定义组件属性：接收路由项和基础路径
 const { item, basePath } = defineProps<{
   item: RouteRecordRaw
   basePath: string
 }>()
 
-// 如果只有一个儿子，说明我们直接渲染这里的一个儿子即可
-// 如果菜单对应的children有多个 ，使用el-submenu去渲染
+// 过滤出非隐藏的子路由
 const filteredChildren = computed(
   () => item.children || [].filter((child) => !child.meta?.hidden)
 )
 
-// 要渲染的路由
+// 计算要渲染的路由项：
+// - 如果只有一个子路由，则使用该子路由
+// - 否则使用当前路由项，但路径置空
 const singleChildRoute = computed(() =>
   filteredChildren.value.length === 1
     ? filteredChildren.value[0]
@@ -51,10 +67,13 @@ const singleChildRoute = computed(() =>
         path: ""
       }
 )
-// 要渲染的图标
+
+// 获取要显示的图标名称
 const iconName = computed(() => singleChildRoute.value.meta?.icon)
 
-// 解析父路径+子路径 resolve可以解析绝对路径 /system /system/menu -> /system/menu
+// 解析完整的路由路径：
+// - 如果是外部链接则直接返回
+// - 否则拼接基础路径和子路径
 const resolvePath = (childPath: string) => {
   if (isExternal(childPath)) {
     return childPath

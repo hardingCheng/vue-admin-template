@@ -1,6 +1,9 @@
 <template>
+  <!-- 主要内容区域容器 -->
   <div class="app-main">
+    <!-- 路由视图组件，使用具名插槽获取当前路由对应的组件 -->
     <router-view v-slot="{ Component }">
+      <!-- 使用 transition 组件实现页面切换动画 -->
       <transition name="fade">
         <keep-alive>
           <component :is="Component" :key="$route.path" />

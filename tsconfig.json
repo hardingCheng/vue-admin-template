@@ -8,7 +8,13 @@
     "components.d.ts"
   ],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
+    { 
+      "path": "./tsconfig.app.json",
+      "composite": true
+    },
+    { 
+      "path": "./tsconfig.node.json",
+      "composite": true
+    }
   ]
 }
