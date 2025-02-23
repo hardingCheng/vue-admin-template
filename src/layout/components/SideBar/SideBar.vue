@@ -1,5 +1,6 @@
 <template>
   <el-menu
+    border-none
     class="sidebar-container-menu"
     router
     :default-active="defaultActive"
@@ -8,7 +9,13 @@
     :active-text-color="varaibles.menuActiveText"
     :collapse="sidebar.opened"
   >
-    <side-bar-item v-for="route in routes" :key="route.path" :item="route" />
+    <!--    :base-path="route.path"  父路径传递-->
+    <side-bar-item
+      v-for="route in routes"
+      :key="route.path"
+      :item="route"
+      :base-path="route.path"
+    />
   </el-menu>
 
   <!-- :collapse="true" -->
