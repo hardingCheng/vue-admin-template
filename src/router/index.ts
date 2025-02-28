@@ -58,7 +58,8 @@ const asyncRoutes: RouteRecordRaw[] = [
     meta: {
       icon: "ant-design:unlock-filled",
       title: "system",
-      alwaysShow: true
+      alwaysShow: true,
+      breadcrumb: false
     },
     children: [
       {

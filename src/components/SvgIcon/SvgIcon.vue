@@ -1,3 +1,18 @@
+<!--
+  SvgIcon 组件
+  
+  作用：
+  - 通用图标组件，支持显示 Iconify 图标库中的图标和外部 SVG 图标
+  - 为整个应用提供统一的图标渲染解决方案
+  
+  功能特色：
+  1. 双模式支持：可以渲染 Iconify 图标库中的图标或外部 SVG 图标
+  2. 自动识别：根据图标名称自动判断使用哪种渲染模式
+  3. 样式定制：支持通过 customClass 属性添加自定义样式
+  4. 属性透传：通过 v-bind="$attrs" 支持将任意属性传递给底层元素
+  5. 外部 SVG 支持：使用 CSS mask 技术渲染外部 SVG 图标
+  6. 兼容性处理：为 mask 属性添加 webkit 前缀以提高兼容性
+-->
 <template>
   <IconifyIcon
     :class="svgClass"

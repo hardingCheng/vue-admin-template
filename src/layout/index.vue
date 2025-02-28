@@ -41,7 +41,7 @@ import AppMain from "@/layout/components/AppMain.vue"
   .header {
     @apply h-84px;
     .navbar {
-      @apply h-50px bg-yellow;
+      @apply h-50px;
     }
     .tags-view {
       @apply h-[var(--tagsview-height)]  bg-blue;

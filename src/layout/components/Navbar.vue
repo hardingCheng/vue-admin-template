@@ -1,11 +1,17 @@
 <template>
   <!-- 顶部导航栏容器 -->
-  <div class="navbar">
+  <div class="navbar" flex>
     <!-- 汉堡包按钮组件：控制侧边栏的展开/收起 -->
     <hamburger
       @toggleCollapse="toggleSidebar"
       :collapse="sidebar.opened"
     ></hamburger>
+    <breadcrumb></breadcrumb>
+    <div flex flex-1 justify-end>
+      <screenfull></screenfull>
+      <size-select></size-select>
+      <avatar></avatar>
+    </div>
   </div>
 </template>
 

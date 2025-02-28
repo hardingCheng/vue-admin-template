@@ -1,3 +1,16 @@
+<!--
+  SideBarItemLink 组件
+  
+  作用：
+  - 智能链接组件，用于侧边栏菜单项的链接处理
+  - 自动区分内部路由和外部链接，并使用适当的组件进行渲染
+  
+  功能特色：
+  1. 动态组件渲染：根据链接类型自动选择渲染为 <router-link> 或 <a> 标签
+  2. 外部链接支持：自动识别外部链接并在新标签页中打开
+  3. 内部路由导航：使用 vue-router 的 router-link 实现无刷新导航
+  4. 灵活的内容插槽：允许传入任意内容作为链接的子元素
+-->
 <template>
   <!-- 动态组件：根据链接类型渲染为 <a> 标签或 <router-link> 组件 -->
   <component :is="componentType" v-bind="componentProps">
