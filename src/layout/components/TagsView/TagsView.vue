@@ -40,7 +40,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, nextTick } from "vue"
 import { useRoute, useRouter } from "vue-router"
 import ScrollPane from "./ScrollPane.vue"
 import { useTagsViewStore } from "@/stores/tagsView"
