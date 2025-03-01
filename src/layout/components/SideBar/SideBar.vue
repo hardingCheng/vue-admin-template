@@ -1,10 +1,10 @@
 <!--
   SideBar 组件
-  
+
   作用：
   - 系统侧边栏的主容器组件
   - 负责渲染整个侧边导航菜单结构
-  
+
   功能特色：
   1. 基于 Element Plus 的菜单组件实现
   2. 动态路由渲染：根据路由配置自动生成菜单结构
@@ -14,13 +14,14 @@
   6. 递归菜单：通过 SideBarItem 组件实现多级菜单的递归渲染
 -->
 <template>
+  <side-logo v-if="showLogo" :collapse="sidebar.opened"></side-logo>
   <el-menu
     border-none
     class="sidebar-container-menu"
     :default-active="defaultActive"
     :background-color="varaibles.menuBg"
     :text-color="varaibles.menuText"
-    :active-text-color="varaibles.menuActiveText"
+    :active-text-color="themeColor"
     :collapse="sidebar.opened"
   >
     <!--    :base-path="route.path"  父路径传递-->
@@ -42,6 +43,8 @@ import { useAppStore } from "@/stores/app"
 import varaibles from "@/style/variables.module.scss"
 // 导入路由配置
 import { routes } from "@/router"
+import { useSettingsStore } from "@/stores/settings.ts"
+import SideLogo from "@/layout/components/SideBar/SideLogo.vue"
 
 // 获取当前路由实例
 const route = useRoute()
@@ -54,6 +57,9 @@ const defaultActive = computed(() => {
   // .....
   return route.path
 })
+const settingsStore = useSettingsStore()
+const themeColor = computed(() => settingsStore.settings.themeColor)
+const showLogo = computed(() => settingsStore.settings.showLogo)
 </script>
 
 <style scoped></style>

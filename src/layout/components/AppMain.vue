@@ -16,7 +16,7 @@
 
 <style scoped lang="scss">
 .app-main {
-  @apply bg-cyan overflow-hidden pos-relative;
+  @apply overflow-hidden pos-relative;
   min-height: calc(100vh - var(--tagsview-height) - var(--navbar-height));
 }
 

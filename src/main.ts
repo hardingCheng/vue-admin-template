@@ -11,6 +11,7 @@ import "uno.css"
 import piniaPluginPersistedstate from "pinia-plugin-persistedstate"
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate) // 安装持久化插件
+
 const app = createApp(App)
 app.use(router)
 app.use(pinia)

@@ -9,8 +9,6 @@ export const useAppStore = defineStore(
         opened: true
       },
       size: "default" as Size
-      // ...
-      // theme
     })
     const sidebar = computed(() => state.sidebar)
     const toggleSidebar = () => {
@@ -21,7 +19,13 @@ export const useAppStore = defineStore(
       state.size = size
     }
     // 必须导出  state  下面持久化插件才认识，缓存
-    return { state, sidebar, toggleSidebar, setSize, size }
+    return {
+      state,
+      sidebar,
+      toggleSidebar,
+      setSize,
+      size
+    }
   },
   {
     persist: {

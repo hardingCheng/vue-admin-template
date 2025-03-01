@@ -10,9 +10,11 @@ $menuText: #bfcbd9;
 $menuActiveText: #409eff;
 // 菜单背景色
 $menuBg: #304156;
-
+// 主题色
+$themeColor: #409eff;
 :export {
   menuText: $menuText;
   menuActiveText: $menuActiveText;
   menuBg: $menuBg;
+  themeColor: $themeColor;
 }

@@ -1,10 +1,10 @@
 <!--
   App 根组件
-  
+
   作用：
   - 应用的入口组件，包含整个应用的根结构
   - 通过 el-config-provider 提供全局配置给所有 Element Plus 组件
-  
+
   功能特色：
   1. 全局配置：为 Element Plus 组件提供统一的尺寸和层级设置
   2. 响应式设计：组件尺寸会根据用户的偏好设置自动调整
@@ -22,12 +22,15 @@
 <script lang="ts" setup>
 import { computed } from "vue"
 import { useAppStore } from "@/stores/app"
+import { useGenerateTheme } from "@/hooks/useGenerateTheme.ts"
 
 // 获取应用状态管理
 const appStore = useAppStore()
 
 // 计算属性：获取当前组件尺寸设置
 const size = computed(() => appStore.size)
+
+useGenerateTheme()
 </script>
 
 <style scoped></style>

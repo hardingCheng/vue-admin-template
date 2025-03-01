@@ -12,7 +12,7 @@
         <!--  上边包含收缩的导航条 -->
         <navbar></navbar>
         <!-- 标签导航栏：用于显示页面导航标签 -->
-        <div class="tags-view">导航条-2</div>
+        <!--        <tags-view />-->
       </div>
       <!-- 主要内容区域：用于显示路由页面内容 -->
       <app-main></app-main>/

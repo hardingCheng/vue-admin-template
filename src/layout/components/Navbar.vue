@@ -11,6 +11,7 @@
       <screenfull></screenfull>
       <size-select></size-select>
       <avatar></avatar>
+      <setting></setting>
     </div>
   </div>
 </template>

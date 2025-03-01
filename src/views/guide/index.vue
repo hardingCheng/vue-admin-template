@@ -1,9 +1,7 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>
-    <el-button>231311</el-button>
-  </div>
+  <div></div>
 </template>
 
 <style scoped></style>
