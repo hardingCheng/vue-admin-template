@@ -1,343 +1,234 @@
 <template>
-  <div class="tags-view-container">
-    <scroll-pane ref="scrollPaneRef" class="tags-view-wrapper">
-      <router-link
-        v-for="tag in visitedViews"
-        :key="tag.path"
-        :class="isActive(tag) ? 'active' : ''"
-        :to="{ path: tag.path, query: tag.query, fullPath: tag.fullPath }"
-        class="tags-view-item"
-        :style="activeStyle(tag)"
-        @click.middle="!isAffix(tag) && closeSelectedTag(tag)"
-        @contextmenu.prevent="openMenu(tag, $event)"
-      >
-        {{ tag.title }}
-        <span
-          v-if="!isAffix(tag)"
-          class="el-icon-close"
-          @click.prevent.stop="closeSelectedTag(tag)"
+  <div class="tags-view">
+    <el-scrollbar class="tags-view-scrollbar">
+      <div class="tags-view-container">
+        <router-link
+          v-for="tag in visitedViews"
+          :key="tag.path"
+          :to="{ path: tag.path, query: tag.query }"
+          class="tags-view-item"
+          :class="{ active: tag.path === $route.path }"
+          @click.middle="closeSelectedTag(tag)"
         >
-          <svg-icon icon-name="ant-design:close-outlined" />
-        </span>
-      </router-link>
-    </scroll-pane>
-    <ul
-      v-show="visible"
-      :style="{ left: left + 'px', top: top + 'px' }"
-      class="contextmenu"
-    >
-      <li @click="refreshSelectedTag(selectedTag)">刷新</li>
-      <li v-if="!isAffix(selectedTag)" @click="closeSelectedTag(selectedTag)">
-        关闭
-      </li>
-      <li @click="closeOthersTags">关闭其他</li>
-      <li @click="closeAllTags(selectedTag)">关闭所有</li>
-      <li v-if="!isAffix(selectedTag)" @click="toggleFixedTag(selectedTag)">
-        {{ isTagFixed(selectedTag) ? "取消固定" : "固定标签" }}
-      </li>
-    </ul>
+          <!-- 右键菜单 -->
+          <el-dropdown
+            placement="top-start"
+            trigger="contextmenu"
+            @command="(command) => handleCommand(command, tag)"
+          >
+            <span leading-28px>{{ tag.title }}</span>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item command="all">关闭所有</el-dropdown-item>
+                <el-dropdown-item command="other">关闭其他</el-dropdown-item>
+                <el-dropdown-item v-if="!tag.meta?.affix" command="self"
+                  >关闭</el-dropdown-item
+                >
+                <el-dropdown-item command="refresh">刷新</el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
+          <span
+            v-if="!tag.meta?.affix"
+            class="el-icon-close"
+            @click.prevent.stop="closeSelectedTag(tag)"
+          >
+            <svg-icon icon-name="ant-design:close-outlined" />
+          </span>
+        </router-link>
+      </div>
+    </el-scrollbar>
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts" setup>
+import { useTagsView } from "@/stores/tagsView"
 import { useRoute, useRouter } from "vue-router"
-import ScrollPane from "./ScrollPane.vue"
-import { useTagsViewStore } from "@/stores/tagsView"
-import path from "path-browserify"
-
-const visible = ref(false)
-const top = ref(0)
-const left = ref(0)
-const selectedTag = ref({})
-const affixTags = ref([])
-const scrollPaneRef = ref(null)
+import { watch, onMounted } from "vue"
+import type { TagView } from "@/stores/tagsView"
 
 const route = useRoute()
 const router = useRouter()
-const tagsViewStore = useTagsViewStore()
+// 不要解构，而是保持对整个 store 的引用
+const tagsViewStore = useTagsView()
 
+// 使用计算属性来保持响应性
+// 注意：不能直接解构 store（如 const { visitedViews } = useTagsView()），
+// 因为这样会导致：
+// 1. 失去响应性：解构会创建普通变量，不是响应式引用
+// 2. 组件不会重新渲染：store 数据变化时，UI 不会更新
+// 3. 单向数据流断开：修改解构变量不会影响原始 store
 const visitedViews = computed(() => tagsViewStore.visitedViews)
-const routes = computed(() => router.options.routes)
-const fixedTags = computed(() => tagsViewStore.fixedTags)
 
-watch(
-  () => route.path,
-  () => {
-    addTags()
-    moveToCurrentTag()
-  }
-)
-
-watch(
-  () => route.fullPath,
-  () => {
-    addTags()
-    moveToCurrentTag()
-  }
-)
-
-watch(
-  () => visible.value,
-  (value) => {
-    if (value) {
-      document.body.addEventListener("click", closeMenu)
-    } else {
-      document.body.removeEventListener("click", closeMenu)
-    }
-  }
-)
-
-function isActive(tag) {
-  return tag.path === route.path
-}
-
-function activeStyle(tag) {
-  if (isActive(tag)) {
-    return {
-      "background-color": "#42b983",
-      "border-color": "#42b983"
-    }
-  }
-  return {}
-}
-
-function isAffix(tag) {
-  return tag.meta && tag.meta.affix
-}
-
-function isTagFixed(tag) {
-  return fixedTags.value.some((t) => t.path === tag.path)
-}
-
-function filterAffixTags(routes, basePath = "/") {
-  let tags = []
-  routes.forEach((route) => {
-    if (route.meta && route.meta.affix) {
-      const tagPath = path.resolve(basePath, route.path)
-      tags.push({
-        fullPath: tagPath,
-        path: tagPath,
-        name: route.name,
-        meta: { ...route.meta }
-      })
-    }
-    if (route.children) {
-      const tempTags = filterAffixTags(
-        route.children,
-        path.resolve(basePath, route.path)
-      )
-      if (tempTags.length >= 1) {
-        tags = [...tags, ...tempTags]
-      }
-    }
-  })
-  return tags
-}
-
-function initTags() {
-  const affixTags = filterAffixTags(routes.value)
-  for (const tag of affixTags) {
-    if (tag.name) {
-      tagsViewStore.addVisitedView(tag)
-    }
+// 处理右键菜单命令
+const handleCommand = async (command: string, tag: TagView) => {
+  switch (command) {
+    case "other":
+      await closeOthersTags(tag)
+      break
+    case "all":
+      await closeAllTags()
+      break
+    case "self":
+      closeSelectedTag(tag)
+      break
+    case "refresh":
+      refreshSelectedTag(tag)
+      break
   }
 }
 
-function addTags() {
-  const { name } = route
-  if (name) {
-    tagsViewStore.addView(route)
-  }
-  return false
-}
-
-function moveToCurrentTag() {
-  nextTick(() => {
-    for (const tag of visitedViews.value) {
-      if (tag.path === route.path) {
-        scrollPaneRef.value.moveToTarget(tag)
-        // 如果是激活状态，则不再执行
-        if (tag.path !== route.path) {
-          tagsViewStore.updateVisitedView(route)
-        }
-        break
-      }
-    }
-  })
-}
-
-function refreshSelectedTag(view) {
-  tagsViewStore.delCachedView(view)
-  const { fullPath } = view
-  nextTick(() => {
-    router.replace({
-      path: "/redirect" + fullPath
+// 关闭其他标签
+const closeOthersTags = async (tag: TagView) => {
+  // 使用 store 中的方法
+  const result = await tagsViewStore.deleteOtherViews(tag)
+  // 检查是否需要导航到选中的标签
+  if (tag.path !== route.path) {
+    router.push({
+      path: tag.path,
+      query: tag.query
     })
+  }
+  console.log("关闭其他标签后的结果:", result)
+}
+
+// 刷新当前标签
+const refreshSelectedTag = (tag: TagView) => {
+  tagsViewStore.deleteCachedView(tag)
+  // 使用重定向路由实现页面刷新
+  // 先跳转到一个中间路由 /redirect 然后再跳回原页面
+  // 这样可以强制组件重新创建，达到刷新效果
+  const { path } = tag
+  router.replace({
+    path: "/redirect" + path
   })
 }
 
-function closeSelectedTag(view) {
-  tagsViewStore.delView(view).then(({ visitedViews }) => {
-    if (isActive(view)) {
-      toLastView(visitedViews, view)
-    }
-  })
+// 关闭所有标签
+const closeAllTags = async () => {
+  // 使用 store 中的方法
+  const result = await tagsViewStore.deleteAllViews()
+  // 导航到首页
+  router.push("/")
+  console.log("关闭所有标签后的结果:", result)
 }
 
-function closeOthersTags() {
-  router.push(selectedTag.value)
-  tagsViewStore.delOthersViews(selectedTag.value).then(() => {
-    moveToCurrentTag()
-  })
-}
-
-function closeAllTags(view) {
-  tagsViewStore.delAllViews().then(({ visitedViews }) => {
-    if (affixTags.value.some((tag) => tag.path === view.path)) {
-      return
-    }
-    toLastView(visitedViews, view)
-  })
-}
-
-function toggleFixedTag(tag) {
-  if (isTagFixed(tag)) {
-    tagsViewStore.removeFixedTag(tag)
-  } else {
-    tagsViewStore.addFixedTag(tag)
+// 关闭选中的标签
+const closeSelectedTag = (view) => {
+  tagsViewStore.deleteView(view)
+  if (view.path === route.path) {
+    toLastView(tagsViewStore.visitedViews, view)
   }
 }
 
-function toLastView(visitedViews, view) {
+// 导航到最后一个可用的视图
+const toLastView = (visitedViews, view) => {
   const latestView = visitedViews.slice(-1)[0]
   if (latestView) {
-    router.push(latestView.fullPath)
+    router.push(latestView.path)
   } else {
     // 如果没有标签视图，则重定向到首页
-    if (view.name === "Dashboard") {
-      // 重新加载当前路由
-      router.replace({ path: "/redirect" + view.fullPath })
+    if (view.name === "dashboard") {
+      // 如果关闭的是首页，则重新加载
+      router.push({ path: "/redirect" + view.path })
     } else {
       router.push("/")
     }
   }
 }
 
-function openMenu(tag, e) {
-  // 获取当前点击的标签元素
-  const tagElement = e.target.closest(".tags-view-item")
-  if (!tagElement) return
+// 添加固定标签
+const addAffixTags = () => {
+  const routes = router.getRoutes()
+  // 过滤出所有 meta.affix 为 true 的路由
+  const affixRoutes = routes.filter((route) => route.meta?.affix === true)
 
-  // 获取标签的位置信息
-  const tagRect = tagElement.getBoundingClientRect()
-  const offsetLeft = document
-    .querySelector(".tags-view-container")
-    .getBoundingClientRect().left
-  // const menuWidth = 105 // 菜单宽度
-
-  // 设置菜单位置在标签的正下方并水平居中
-  left.value = tagRect.left - offsetLeft + 210
-  top.value = tagRect.bottom // 标签底部正下方
-
-  visible.value = true
-  selectedTag.value = tag
+  // 将这些路由添加到标签视图中
+  affixRoutes.forEach((route) => {
+    tagsViewStore.addView(route)
+  })
 }
 
-function closeMenu() {
-  visible.value = false
-}
+// 添加 watch 监听路由变化
+watch(
+  () => route.path,
+  () => {
+    tagsViewStore.addView(route)
+  }
+)
 
+// 组件挂载时添加当前路由到标签，并添加固定标签
 onMounted(() => {
-  initTags()
-  addTags()
+  addAffixTags() // 先添加固定标签
+  tagsViewStore.addView(route) // 再添加当前路由
 })
 </script>
-
 <style scoped lang="scss">
-.tags-view-container {
-  height: 34px;
+.tags-view {
+  @apply h-[var(--tagsview-height)];
   width: 100%;
   background: #fff;
   border-bottom: 1px solid #d8dce5;
   box-shadow:
     0 1px 3px 0 rgba(0, 0, 0, 0.12),
     0 0 3px 0 rgba(0, 0, 0, 0.04);
-  .tags-view-wrapper {
-    height: 100%;
-    .tags-view-item {
-      display: inline-block;
-      position: relative;
-      cursor: pointer;
-      height: 26px;
-      line-height: 26px;
-      border: 1px solid #d8dce5;
-      color: #495060;
-      background: #fff;
-      padding: 0 8px;
-      font-size: 12px;
-      margin-left: 5px;
-      //margin-top: 4px;
-      &:first-of-type {
-        margin-left: 15px;
-      }
-      &:last-of-type {
-        margin-right: 15px;
-      }
-      &.active {
-        background-color: #42b983;
-        color: #fff;
-        border-color: #42b983;
-        &::before {
-          content: "";
-          background: #fff;
-          display: inline-block;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          position: relative;
-          margin-right: 2px;
-        }
-      }
-      .el-icon-close {
-        width: 16px;
-        height: 16px;
-        vertical-align: 2px;
-        border-radius: 50%;
-        text-align: center;
-        transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
-        transform-origin: 100% 50%;
-        &:before {
-          transform: scale(0.6);
-          display: inline-block;
-          vertical-align: -3px;
-        }
-        //&:hover {
-        //  background-color: #b4bccc;
-        //  color: #fff;
-        //}
-      }
-    }
-  }
-  .contextmenu {
-    margin: 0;
-    background: #fff;
-    z-index: 3000;
-    position: absolute;
-    list-style-type: none;
-    padding: 5px 0;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 400;
-    color: #333;
-    box-shadow: 2px 2px 3px 0 rgba(0, 0, 0, 0.3);
-    li {
-      margin: 0;
-      padding: 7px 16px;
-      cursor: pointer;
-      &:hover {
-        background: #eee;
-      }
-    }
-  }
+}
+
+.tags-view-scrollbar {
+  height: 100%;
+  width: 100%;
+}
+
+.tags-view-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  white-space: nowrap;
+  padding: 0 10px;
+}
+
+.tags-view-item {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 5px;
+  padding: 0 8px;
+  height: 26px;
+  line-height: 26px;
+  border: 1px solid #d8dce5;
+  border-radius: 3px;
+  font-size: 12px;
+  color: #495060;
+  background: #fff;
+  cursor: pointer;
+}
+
+.tags-view-item.active {
+  background-color: #42b983;
+  color: #fff;
+  border-color: #42b983;
+}
+
+.tags-view-item .el-icon-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 5px;
+  width: 16px;
+  height: 16px;
+  vertical-align: middle;
+  border-radius: 50%;
+  text-align: center;
+  transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+  transform-origin: 100% 50%;
+}
+
+.tags-view-item .el-icon-close:hover {
+  background-color: #b4bccc;
+  color: #fff;
+}
+
+.tags-view-item.active .el-icon-close:hover {
+  background-color: #fff;
+  color: #42b983;
 }
 </style>

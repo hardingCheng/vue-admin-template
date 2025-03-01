@@ -34,7 +34,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Screenfull: typeof import('./src/components/Screenfull/Screenfull.vue')['default']
-    ScrollPane: typeof import('./src/layout/components/TagsView/ScrollPane.vue')['default']
     Setting: typeof import('./src/components/Setting/Setting.vue')['default']
     SettingDetail: typeof import('./src/components/Setting/SettingDetail.vue')['default']
     SideBar: typeof import('./src/layout/components/SideBar/SideBar.vue')['default']

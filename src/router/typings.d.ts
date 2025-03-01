@@ -7,5 +7,7 @@ declare module "vue-router" {
     title?: string
     hidden?: boolean
     alwaysShow?: boolean
+    affix?: boolean
+    noCache?: boolean
   }
 }

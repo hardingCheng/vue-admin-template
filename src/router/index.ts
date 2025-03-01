@@ -12,7 +12,9 @@ export const constantRoutes: RouteRecordRaw[] = [
         component: () => import("@/views/dashboard/index.vue"),
         meta: {
           icon: "ant-design:bank-outlined",
-          title: "dashboard"
+          title: "dashboard",
+          affix: true,
+          noCache: true
         }
       }
     ]
@@ -87,6 +89,25 @@ const asyncRoutes: RouteRecordRaw[] = [
         meta: {
           icon: "ant-design:unlock-filled",
           title: "user"
+        }
+      }
+    ]
+  },
+  // ... 其他路由配置 ...
+  {
+    path: "/redirect",
+    component: Layout,
+    meta: {
+      hidden: true,
+      noTagsView: true // 添加这个标记，表示不添加到标签视图
+    },
+    children: [
+      {
+        path: "/redirect/:path(.*)",
+        component: () => import("@/views/redirect/index.vue"),
+        meta: {
+          hidden: true,
+          noTagsView: true // 子路由也添加这个标记
         }
       }
     ]

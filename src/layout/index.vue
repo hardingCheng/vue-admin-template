@@ -12,10 +12,10 @@
         <!--  上边包含收缩的导航条 -->
         <navbar></navbar>
         <!-- 标签导航栏：用于显示页面导航标签 -->
-        <!--        <tags-view />-->
+        <tags-view />
       </div>
       <!-- 主要内容区域：用于显示路由页面内容 -->
-      <app-main></app-main>/
+      <app-main></app-main>
     </div>
   </div>
 </template>
@@ -36,7 +36,7 @@ import AppMain from "@/layout/components/AppMain.vue"
     }
   }
   .main-container {
-    @apply flex flex-col flex-1;
+    @apply flex flex-col flex-1 overflow-hidden;
   }
   .header {
     @apply h-84px;
@@ -44,7 +44,7 @@ import AppMain from "@/layout/components/AppMain.vue"
       @apply h-50px;
     }
     .tags-view {
-      @apply h-[var(--tagsview-height)]  bg-blue;
+      @apply h-[var(--tagsview-height)];
     }
   }
 }

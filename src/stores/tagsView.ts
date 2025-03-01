@@ -1,52 +1,63 @@
 import { defineStore } from "pinia"
 import { ref } from "vue"
+import type { RouteLocationNormalized } from "vue-router"
 
-export const useTagsViewStore = defineStore("tagsView", () => {
-  const visitedViews = ref([])
-  const cachedViews = ref([])
-  const fixedTags = ref([])
+export interface TagView extends Partial<RouteLocationNormalized> {
+  title?: string
+}
 
-  function addView(view) {
+export const useTagsView = defineStore("tagsView", () => {
+  const visitedViews = ref<TagView[]>([])
+  const cachedViews = ref<string[]>([])
+
+  const addView = (view: TagView) => {
     addVisitedView(view)
     addCachedView(view)
   }
 
-  function addVisitedView(view) {
-    if (visitedViews.value.some((v) => v.path === view.path)) return
+  const addVisitedView = (view: TagView) => {
+    // 如果路由标记为不添加到标签视图，则跳过
+    addCachedView(view)
+    if (view.meta?.noTagsView) return
+
+    if (visitedViews.value.some((v) => v.path === view.path)) {
+      // 如果路径已存在，更新该标签的 query 参数
+      for (let i = 0; i < visitedViews.value.length; i++) {
+        console.warn("Duplicate path:", view.path)
+        if (visitedViews.value[i].path === view.path) {
+          // 保留原有标签的 title，但更新 query 和其他属性
+          const updatedView = Object.assign({}, view, {
+            title: visitedViews.value[i].title || view.meta?.title || "no-name",
+            query: view.query
+          })
+          visitedViews.value.splice(i, 1, updatedView)
+          break
+        }
+      }
+      return
+    }
+
+    // 如果是新标签，添加到列表中，并保留 query 参数
     visitedViews.value.push(
       Object.assign({}, view, {
-        title: view.meta.title || "no-name"
+        title: view.meta?.title || "no-name",
+        query: view.query
       })
     )
   }
 
-  function addCachedView(view) {
-    if (cachedViews.value.includes(view.name)) return
-    if (!view.meta.noCache) {
-      cachedViews.value.push(view.name)
+  const addCachedView = (view: TagView) => {
+    if (cachedViews.value.includes(view.name as string)) return
+    // 当 noCache 为 true 时，添加到缓存列表
+    if (view.meta?.noCache) {
+      cachedViews.value.push(view.name as string)
     }
   }
 
-  function addFixedTag(view) {
-    if (fixedTags.value.some((v) => v.path === view.path)) return
-    fixedTags.value.push(
-      Object.assign({}, view, {
-        title: view.meta.title || "no-name"
-      })
-    )
-  }
-
-  function removeFixedTag(view) {
-    const index = fixedTags.value.findIndex((v) => v.path === view.path)
-    if (index > -1) {
-      fixedTags.value.splice(index, 1)
-    }
-  }
-
-  function delView(view) {
+  const deleteView = (view: TagView) => {
     return new Promise((resolve) => {
-      delVisitedView(view)
-      delCachedView(view)
+      deleteVisitedView(view)
+      deleteCachedView(view)
       resolve({
         visitedViews: [...visitedViews.value],
         cachedViews: [...cachedViews.value]
@@ -54,7 +65,7 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     })
   }
 
-  function delVisitedView(view) {
+  const deleteVisitedView = (view: TagView) => {
     for (const [i, v] of visitedViews.value.entries()) {
       if (v.path === view.path) {
         visitedViews.value.splice(i, 1)
@@ -63,17 +74,17 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     }
   }
 
-  function delCachedView(view) {
-    const index = cachedViews.value.indexOf(view.name)
+  const deleteCachedView = (view: TagView) => {
+    const index = cachedViews.value.indexOf(view.name as string)
     if (index > -1) {
       cachedViews.value.splice(index, 1)
     }
   }
 
-  function delOthersViews(view) {
+  const deleteOtherViews = (view: TagView) => {
     return new Promise((resolve) => {
-      delOthersVisitedViews(view)
-      delOthersCachedViews(view)
+      deleteOtherVisitedViews(view)
+      deleteOtherCachedViews(view)
       resolve({
         visitedViews: [...visitedViews.value],
         cachedViews: [...cachedViews.value]
@@ -81,30 +92,25 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     })
   }
 
-  function delOthersVisitedViews(view) {
+  const deleteOtherVisitedViews = (view: TagView) => {
     visitedViews.value = visitedViews.value.filter((v) => {
-      return v.meta.affix || v.path === view.path || isTagFixed(v)
+      return v.meta?.affix || v.path === view.path
     })
   }
 
-  function isTagFixed(view) {
-    return fixedTags.value.some((v) => v.path === view.path)
-  }
-
-  function delOthersCachedViews(view) {
-    const index = cachedViews.value.indexOf(view.name)
+  const deleteOtherCachedViews = (view: TagView) => {
+    const index = cachedViews.value.indexOf(view.name as string)
     if (index > -1) {
       cachedViews.value = cachedViews.value.slice(index, index + 1)
     } else {
-      // 如果没有找到当前视图，则清空所有缓存视图
       cachedViews.value = []
     }
   }
 
-  function delAllViews() {
+  const deleteAllViews = () => {
     return new Promise((resolve) => {
-      delAllVisitedViews()
-      delAllCachedViews()
+      deleteAllVisitedViews()
+      deleteAllCachedViews()
       resolve({
         visitedViews: [...visitedViews.value],
         cachedViews: [...cachedViews.value]
@@ -112,44 +118,26 @@ export const useTagsViewStore = defineStore("tagsView", () => {
     })
   }
 
-  function delAllVisitedViews() {
+  const deleteAllVisitedViews = () => {
     // 保留固定的标签
-    visitedViews.value = visitedViews.value.filter(
-      (tag) => tag.meta.affix || isTagFixed(tag)
-    )
+    visitedViews.value = visitedViews.value.filter((tag) => tag.meta?.affix)
   }
 
-  function delAllCachedViews() {
+  const deleteAllCachedViews = () => {
     cachedViews.value = []
   }
 
-  function updateVisitedView(view) {
-    for (let v of visitedViews.value) {
-      if (v.path === view.path) {
-        v = Object.assign(v, view)
-        break
-      }
-    }
-  }
-
+  // 确保这两个方法被正确导出
   return {
     visitedViews,
     cachedViews,
-    fixedTags,
     addView,
     addVisitedView,
     addCachedView,
-    addFixedTag,
-    removeFixedTag,
-    delView,
-    delVisitedView,
-    delCachedView,
-    delOthersViews,
-    delOthersVisitedViews,
-    delOthersCachedViews,
-    delAllViews,
-    delAllVisitedViews,
-    delAllCachedViews,
-    updateVisitedView
+    deleteView,
+    deleteVisitedView,
+    deleteCachedView,
+    deleteOtherViews, // 确保这个方法被导出
+    deleteAllViews // 确保这个方法被导出
   }
 })
