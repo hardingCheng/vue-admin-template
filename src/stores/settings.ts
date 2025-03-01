@@ -8,7 +8,8 @@ export const useSettingsStore = defineStore(
     const settings = reactive({
       themeColor: varaibles.themeColor,
       originalThemeColor: "",
-      showLogo: true // 添加控制是否显示logo的配置项
+      showLogo: true,
+      showTagsView: true
     })
     type ISetting = typeof settings
 
@@ -31,13 +32,18 @@ export const useSettingsStore = defineStore(
       changeSettings,
       setThemeColor,
       themeColor: computed(() => settings.themeColor),
-      showLogo: computed(() => settings.showLogo) // 导出showLogo的计算属性
+      showLogo: computed(() => settings.showLogo),
+      showTagsView: computed(() => settings.showTagsView)
     }
   },
   {
     persist: {
       storage: window.localStorage,
-      pick: ["settings.themeColor", "settings.showLogo"] // 添加showLogo到持久化列表
+      pick: [
+        "settings.themeColor",
+        "settings.showLogo",
+        "settings.showTagsView"
+      ] // 添加showLogo到持久化列表
     }
   }
 )

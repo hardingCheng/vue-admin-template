@@ -37,6 +37,15 @@
         @change="toggleShowLogo"
       />
     </div>
+
+    <!-- 添加 TagsView 显示设置 -->
+    <div class="setting-item">
+      <span class="setting-label">显示标签栏</span>
+      <el-switch
+        v-model="settingsStore.settings.showTagsView"
+        @change="toggleShowTagsView"
+      />
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -70,6 +79,11 @@ const changeThemeColor = (color: string) => {
 // 切换Logo显示状态
 const toggleShowLogo = (value: boolean) => {
   settingsStore.changeSettings({ key: "showLogo", value })
+}
+
+// 切换 TagsView 显示状态
+const toggleShowTagsView = (value: boolean) => {
+  settingsStore.changeSettings({ key: "showTagsView", value })
 }
 </script>
 <style scoped lang="scss">

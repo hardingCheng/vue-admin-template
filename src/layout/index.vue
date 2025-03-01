@@ -8,11 +8,14 @@
     <!-- 右侧主要内容区域 -->
     <div class="main-container">
       <!-- 顶部区域：包含导航栏和标签栏 -->
-      <div class="header">
+      <div
+        class="header"
+        :class="{ 'no-tags-view': !settingsStore.settings.showTagsView }"
+      >
         <!--  上边包含收缩的导航条 -->
         <navbar></navbar>
         <!-- 标签导航栏：用于显示页面导航标签 -->
-        <tags-view />
+        <tags-view v-if="settingsStore.settings.showTagsView" />
       </div>
       <!-- 主要内容区域：用于显示路由页面内容 -->
       <app-main></app-main>
@@ -23,6 +26,9 @@
 <script setup lang="ts">
 // 导入主内容区域组件，用于显示路由匹配的组件内容
 import AppMain from "@/layout/components/AppMain.vue"
+import { useSettingsStore } from "@/stores/settings"
+
+const settingsStore = useSettingsStore()
 </script>
 
 <style scoped lang="scss">
@@ -40,6 +46,12 @@ import AppMain from "@/layout/components/AppMain.vue"
   }
   .header {
     @apply h-84px;
+    transition: height 0.3s;
+
+    &.no-tags-view {
+      @apply h-50px;
+    }
+
     .navbar {
       @apply h-50px;
     }
