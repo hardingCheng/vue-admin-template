@@ -1,3 +1,11 @@
+<!--
+ * @description: 系统设置组件
+ * @features: 
+ *   1. 点击设置图标打开抽屉式设置面板
+ *   2. 包含主题设置、布局配置等全局设置项
+ *   3. 设置项通过 SettingDetail 子组件进行具体实现
+ * @usage: 通常放置在导航栏右侧，用于全局配置的快速访问
+-->
 <template>
   <div class="setting-icon" @click="openDrawer">
     <svg-icon icon-name="ant-design:setting-outlined" class="setting-svg" />

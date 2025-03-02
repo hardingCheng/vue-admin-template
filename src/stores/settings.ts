@@ -43,7 +43,7 @@ export const useSettingsStore = defineStore(
         "settings.themeColor",
         "settings.showLogo",
         "settings.showTagsView"
-      ] // 添加showLogo到持久化列表
+      ]
     }
   }
 )

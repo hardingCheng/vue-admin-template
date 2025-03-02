@@ -1,3 +1,20 @@
+<!--
+  侧边栏 Logo 组件
+  
+  功能描述：
+  - 显示系统 Logo 和标题
+  - 支持侧边栏折叠状态的响应式显示
+  - 点击 Logo 可导航至首页
+  
+  属性：
+  - collapse: Boolean - 控制侧边栏是否处于折叠状态
+    - true: 仅显示 Logo 图标，居中显示
+    - false: 显示 Logo 图标和系统标题
+  
+  样式特点：
+  - 自适应侧边栏宽度变化
+  - 折叠时平滑过渡动画
+-->
 <template>
   <div class="sidebar-logon-container" :class="{ collapse }">
     <router-link to="/">

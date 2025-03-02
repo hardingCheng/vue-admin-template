@@ -137,7 +137,7 @@ export const useTagsView = defineStore("tagsView", () => {
     deleteView,
     deleteVisitedView,
     deleteCachedView,
-    deleteOtherViews, // 确保这个方法被导出
-    deleteAllViews // 确保这个方法被导出
+    deleteOtherViews,
+    deleteAllViews
   }
 })
